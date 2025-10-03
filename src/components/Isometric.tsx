@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
-import { createEffect, onMount } from 'solid-js';
-import { autodispose, Canvas, Entity, useThree } from 'solid-three';
+import { createEffect, createMemo, onMount } from 'solid-js';
+import { autodispose, Canvas, Entity, useFrame, useThree } from 'solid-three';
 import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { layout, rectLayer, rectViaLayer } from '../model/layout';
 
 const SiliconMesh = () => {
@@ -59,6 +60,19 @@ const SiliconMesh = () => {
   return null;
 };
 
+const OrbitController = () => {
+  const { currentCamera, gl } = useThree();
+
+  const controls = createMemo<OrbitControls>((previous) => {
+    const controls = autodispose(new OrbitControls(currentCamera, gl.domElement));
+    return controls;
+  });
+
+  useFrame(() => controls().update());
+
+  return null;
+};
+
 export default function Isometric() {
   return (
     <Canvas
@@ -67,6 +81,7 @@ export default function Isometric() {
       style={{ width: '400px', height: '600px' }}
     >
       <SiliconMesh />
+      <OrbitController />
       <Entity from={THREE.AmbientLight} intensity={0.1} />
       <Entity from={THREE.PointLight} position={[0, 600, -250]} />
     </Canvas>
