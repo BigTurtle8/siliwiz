@@ -4,6 +4,7 @@ import { createEffect, createMemo, onMount } from 'solid-js';
 import { autodispose, Canvas, Entity, useFrame, useThree } from 'solid-three';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { CSG } from 'three-csg-ts';
 import { layout, rectLayer, rectViaLayer } from '../model/layout';
 
 const SiliconMesh = () => {
@@ -23,6 +24,8 @@ const SiliconMesh = () => {
       scene.remove(group);
 
       group = autodispose(new THREE.Group());
+
+      const meshes: THREE.Mesh[] = autodispose([]);
 
       for (const rect of rects()) {
         const layer = rectLayer(rect);
@@ -45,7 +48,22 @@ const SiliconMesh = () => {
 
         mesh.updateMatrix();
 
-        group.add(mesh);
+        meshes.push(mesh);
+      }
+
+      // Incredibly inefficient, to be fixed by someone,
+      // some time, probably
+      // Fixes z-fighting by subtracting
+      // overlapping geometry
+      for (let i = 1; i < meshes.length; i++) {
+        for (let j = i - 1; j >= 0; j--) {
+          meshes[j] = CSG.subtract(meshes[j], meshes[i]);
+          meshes[j].updateMatrix();
+        }
+      }
+
+      for (let i = 0; i < meshes.length; i++) {
+        group.add(meshes[i]);
       }
 
       group.rotation.set((7 * Math.PI) / 4, 0, Math.PI / 4);
