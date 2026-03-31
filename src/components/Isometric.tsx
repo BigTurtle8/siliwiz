@@ -85,8 +85,7 @@ export default function Isometric() {
     >
       <SiliconMesh />
       <OrbitController />
-      <Entity from={THREE.AmbientLight} intensity={0.1} />
-      <Entity from={THREE.PointLight} position={[0, 600, -250]} />
+      <Entity from={THREE.AmbientLight} intensity={0.25} />
     </Canvas>
   );
 }
