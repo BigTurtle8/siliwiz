@@ -36,11 +36,14 @@ const SiliconMesh = () => {
         );
         const material = autodispose(new THREE.MeshStandardMaterial({ color: layer.color }));
 
+        // reminder: as with cross sectional view, origin is
+        // at top, so lower meshZ appears higher
+        const meshZ: number = viaLayer.isoZ ?? viaLayer.crossY;
         const mesh = autodispose(new THREE.Mesh(geometry, material));
         mesh.position.set(
           rect.x + rect.width / 2,
-          -(rect.y + rect.height / 2),
-          -viaLayer.crossY - viaLayer.crossHeight / 2,
+          rect.y + rect.height / 2,
+          meshZ + viaLayer.crossHeight / 2,
         );
 
         mesh.updateMatrix();
@@ -48,7 +51,7 @@ const SiliconMesh = () => {
         group.add(mesh);
       }
 
-      group.rotation.set((7 * Math.PI) / 4, 0, Math.PI / 4);
+      group.rotation.set((11 * Math.PI) / 4, 0, -Math.PI / 4);
       group.position.set(-275, 100, 0);
 
       group.updateMatrix();
